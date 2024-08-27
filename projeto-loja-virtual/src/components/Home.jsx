@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import ProductItem from '../components/ProductItem';
 import AddProduct from '../components/AddProduct';
 import EditProduct from '../components/EditProduct';
+import Modal from '../components/Modal';
 import { getProducts, addProduct, updateProduct, deleteProduct } from '../services/api';
 import './ProductList.css'; 
 
@@ -14,7 +15,9 @@ const Home = () => {
     const [maxPrice, setMaxPrice] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [productsPerPage] = useState(5);
-    const [sortOrder, setSortOrder] = useState('asc'); // Para ordenar os produtos
+    const [sortOrder, setSortOrder] = useState('asc');
+    const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
+    const [isEditProductModalOpen, setIsEditProductModalOpen] = useState(false);
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -29,7 +32,6 @@ const Home = () => {
         fetchProducts();
     }, [products]);
 
-    // Filtra produtos com base na categoria selecionada e no preço
     const filteredProducts = products.filter(product => {
         const inCategory = selectedCategory === 'all' || product.category === selectedCategory;
         const inPriceRange = (minPrice === '' || product.price >= minPrice) &&
@@ -37,16 +39,14 @@ const Home = () => {
         return inCategory && inPriceRange;
     });
 
-    // Ordena produtos
     const sortedProducts = filteredProducts.sort((a, b) => {
         if (sortOrder === 'asc') {
-            return a.title.localeCompare(b.title); // Ordenação alfabética crescente
+            return a.title.localeCompare(b.title);
         } else {
-            return b.title.localeCompare(a.title); // Ordenação alfabética decrescente
+            return b.title.localeCompare(a.title);
         }
     });
 
-    // Paginação
     const indexOfLastProduct = currentPage * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
     const currentProducts = sortedProducts.slice(indexOfFirstProduct, indexOfLastProduct);
@@ -65,6 +65,7 @@ const Home = () => {
             await addProduct(productData);
             const response = await getProducts();
             setProducts(response.data);
+            setIsAddProductModalOpen(false); // Fecha o modal após adicionar
         } catch (error) {
             console.error('Erro ao adicionar produto:', error);
         }
@@ -80,6 +81,7 @@ const Home = () => {
             if (Array.isArray(response.data)) {
                 setProducts(response.data);
                 setEditingProductId(null);
+                setIsEditProductModalOpen(false); // Fecha o modal após atualizar
             } else {
                 console.error('A resposta da API não é um array:', response.data);
             }
@@ -135,7 +137,7 @@ const Home = () => {
                             <div>
                                 <h2>{product.title}</h2>
                                 <p>Preço: ${product.price}</p>
-                                <button onClick={() => setEditingProductId(product.id)}>
+                                <button onClick={() => { setEditingProductId(product.id); setIsEditProductModalOpen(true); }}>
                                     Editar
                                 </button>
                                 <button onClick={() => handleProductDeleted(product.id)}>
@@ -155,17 +157,22 @@ const Home = () => {
                     </button>
                 ))}
             </div>
-            <div className="add-product-container">
-                <AddProduct onProductAdded={handleProductAdded} />
-            </div>
-            {editingProductId && (
-                <div className="edit-product-container">
+            <button className="add-product-button" onClick={() => setIsAddProductModalOpen(true)}>
+                Adicionar Produto
+            </button>
+            {isAddProductModalOpen && (
+                <Modal onClose={() => setIsAddProductModalOpen(false)}>
+                    <AddProduct onProductAdded={handleProductAdded} />
+                </Modal>
+            )}
+            {isEditProductModalOpen && (
+                <Modal onClose={() => { setEditingProductId(null); setIsEditProductModalOpen(false); }}>
                     <EditProduct 
                         productId={editingProductId} 
                         onProductUpdated={handleProductUpdated} 
-                        onCancel={() => setEditingProductId(null)}
+                        onCancel={() => { setEditingProductId(null); setIsEditProductModalOpen(false); }}
                     />
-                </div>
+                </Modal>
             )}
         </div>
     );

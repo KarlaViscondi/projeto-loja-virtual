@@ -1,3 +1,5 @@
+/* ProductList.css */
+
 /* Container principal */
 .product-list-container {
     display: flex;
@@ -108,6 +110,35 @@
 .pagination button:hover {
     background-color: grey;
 }
+
+.edit-button, .delete-button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    color: white;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    margin-right: 10px; /* Espaço entre os botões */
+}
+
+.edit-button {
+    background-color: gray;
+}
+
+.edit-button:hover {
+    background-color: rgb(87, 86, 86);
+}
+
+.delete-button {
+    background-color: #f44336; 
+}
+
+.delete-button:hover {
+    background-color: #e53935;
+}
+
 
 /* Responsividade */
 @media (max-width: 768px) {

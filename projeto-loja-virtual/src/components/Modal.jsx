@@ -1,13 +1,15 @@
 // src/components/Modal.jsx
 import React from 'react';
-import './Modal.css'; // Adicione seu estilo aqui
+import './Modal.css'; // Certifique-se de que o caminho está correto
 
-const Modal = ({ children, onClose }) => {
+const Modal = ({ onClose, children }) => {
     return (
         <div className="modal-overlay">
             <div className="modal-content">
                 <button className="modal-close" onClick={onClose}>×</button>
-                {children}
+                <div className="modal-body">
+                    {children}
+                </div>
             </div>
         </div>
     );

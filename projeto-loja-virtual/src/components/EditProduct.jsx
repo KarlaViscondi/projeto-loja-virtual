@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getProductById, updateProduct } from '../services/api';
 
-const EditProduct = ({ productId, onProductUpdated }) => {
+const EditProduct = ({ productId, onProductUpdated, onCancel }) => {
     const [product, setProduct] = useState(null);
 
     useEffect(() => {
@@ -14,7 +14,9 @@ const EditProduct = ({ productId, onProductUpdated }) => {
             }
         };
 
-        fetchProduct();
+        if (productId) {
+            fetchProduct();
+        }
     }, [productId]);
 
     const handleChange = (e) => {
@@ -25,14 +27,15 @@ const EditProduct = ({ productId, onProductUpdated }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            console.log('Dados do produto a serem enviados para atualização:', productId, product);
             await updateProduct(productId, product);
-            onProductUpdated();
+            onProductUpdated(product); // Passando o produto atualizado
         } catch (error) {
             console.error('Erro ao atualizar o produto:', error);
         }
     };
 
-    if (!product) return null;
+    if (!product) return <div>Carregando...</div>;
 
     return (
         <div>
@@ -45,6 +48,7 @@ const EditProduct = ({ productId, onProductUpdated }) => {
                         name="title"
                         value={product.title}
                         onChange={handleChange}
+                        required
                     />
                 </div>
                 <div>
@@ -54,6 +58,7 @@ const EditProduct = ({ productId, onProductUpdated }) => {
                         name="image"
                         value={product.image}
                         onChange={handleChange}
+                        required
                     />
                 </div>
                 <div>
@@ -63,9 +68,11 @@ const EditProduct = ({ productId, onProductUpdated }) => {
                         name="price"
                         value={product.price}
                         onChange={handleChange}
+                        required
                     />
                 </div>
                 <button type="submit">Salvar</button>
+                <button type="button" onClick={onCancel}>Cancelar</button>
             </form>
         </div>
     );

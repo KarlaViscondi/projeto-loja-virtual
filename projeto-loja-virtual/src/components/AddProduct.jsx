@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { addProduct } from '../services/api';  
 
 const AddProduct = ({ onProductAdded }) => {
     const [productData, setProductData] = useState({
@@ -9,21 +10,27 @@ const AddProduct = ({ onProductAdded }) => {
     });
 
     const handleChange = (e) => {
+        const { name, value } = e.target;
         setProductData({
             ...productData,
-            [e.target.name]: e.target.value,
+            [name]: value,
         });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await onProductAdded(productData);
-        setProductData({
-            title: '',
-            price: '',
-            image: '',
-            category: '',
-        });
+        try {
+            await addProduct(productData);
+            if (onProductAdded) onProductAdded();  
+            setProductData({
+                title: '',
+                price: '',
+                image: '',
+                category: '',
+            });
+        } catch (error) {
+            console.error('Erro ao adicionar produto:', error);
+        }
     };
 
     return (
@@ -31,7 +38,7 @@ const AddProduct = ({ onProductAdded }) => {
             <input
                 type="text"
                 name="title"
-                placeholder="Title"
+                placeholder="Nome"
                 value={productData.title}
                 onChange={handleChange}
                 required
@@ -39,7 +46,7 @@ const AddProduct = ({ onProductAdded }) => {
             <input
                 type="number"
                 name="price"
-                placeholder="Price"
+                placeholder="Preço"
                 value={productData.price}
                 onChange={handleChange}
                 required
@@ -47,7 +54,7 @@ const AddProduct = ({ onProductAdded }) => {
             <input
                 type="text"
                 name="image"
-                placeholder="Image URL"
+                placeholder="URL Imagem"
                 value={productData.image}
                 onChange={handleChange}
                 required
@@ -55,7 +62,7 @@ const AddProduct = ({ onProductAdded }) => {
             <input
                 type="text"
                 name="category"
-                placeholder="Category"
+                placeholder="Categoria"
                 value={productData.category}
                 onChange={handleChange}
                 required

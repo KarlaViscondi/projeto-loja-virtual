@@ -2,9 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import ProductList from './components/ProductList';
-import ManageProducts from './pages/ManageProducts'; // Verifique se o caminho está correto
 import { getProducts } from './services/api';
+import Home from './components/Home';
 
 const App = () => {
     const [products, setProducts] = useState([]);
@@ -26,8 +25,7 @@ const App = () => {
         <Router>
             <Header />
             <Routes>
-                <Route path="/" element={<ProductList products={products} />} />
-                <Route path="/manage-products" element={<ManageProducts />} />
+                <Route path="/" element={<Home  />} />
             </Routes>
             <Footer />
         </Router>

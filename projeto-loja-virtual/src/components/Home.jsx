@@ -86,9 +86,12 @@ const Home = () => {
             if (!editingProductId) {
                 throw new Error('Product ID is missing'); // Verifica se o ID do produto está presente
             }
+            console.log('Atualizando produto com ID:', editingProductId, 'Dados:', productData);
             await updateProduct(editingProductId, productData); // Chama a função da API para atualizar o produto
             const response = await getProducts(); // Busca a lista atualizada de produtos
+            console.log('Resposta da API:', response);  // Verifique se a resposta é válida
             if (Array.isArray(response.data)) {
+                console.log('Produtos atualizados:', response.data);  // Verifique se a lista contém produtos
                 setProducts(response.data); // Atualiza o estado dos produtos
                 setEditingProductId(null); // Reseta o ID do produto que estava sendo editado
                 setIsEditProductModalOpen(false); // Fecha o modal de edição

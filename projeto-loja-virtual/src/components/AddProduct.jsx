@@ -1,97 +1,99 @@
-import React, { useState } from 'react'; // Importa React e o hook useState para gerenciar o estado local do componente
-import './ProductStyle.css'; // Importa o arquivo CSS para estilização do componente
-import { addProduct } from '../services/api';  // Importa a função addProduct da API para adicionar um novo produto
+// src/components/AddProduct.jsx
+import React, { useState } from 'react';
+import { addProduct } from '../services/api';
+import './ProductStyle.css';
 
-// Componente AddProduct para adicionar novos produtos
+// Exemplo de categorias, geralmente você obteria isso de uma API ou prop
+const categories = [
+    { id: 'Electronics', name: 'Eletrônicos' },
+    { id: 'Clothes', name: 'Roupas' },
+    { id: 'Furniture', name: 'Móveis' },
+    { id: 'Shoes', name: 'Sapatos' },
+    { id: 'Miscellaneous', name: 'Variados' }
+];
+
 const AddProduct = ({ onProductAdded }) => {
-    // Estado local para armazenar os dados do novo produto
     const [productData, setProductData] = useState({
-        title: '',     // Título do produto
-        price: '',     // Preço do produto
-        image: '',     // URL da imagem do produto
-        category: '',  // Categoria do produto
+        title: '',
+        price: '',
+        image: '',
+        categoryId: '',
     });
 
-    // Função handleChange para atualizar o estado quando o usuário insere dados no formulário
     const handleChange = (e) => {
-        const { name, value } = e.target; // Desestruturação do nome e valor do input que foi modificado
+        const { name, value } = e.target;
         setProductData({
-            ...productData,   // Mantém os outros campos intactos
-            [name]: value,    // Atualiza o campo específico com o novo valor
+            ...productData,
+            [name]: value,
         });
     };
 
-    // Função handleSubmit para lidar com o envio do formulário
     const handleSubmit = async (e) => {
-        e.preventDefault(); // Previne o comportamento padrão de recarregar a página ao enviar o formulário
+        e.preventDefault();
         try {
-            await addProduct(productData); // Chama a função para adicionar o produto usando os dados do estado
-            if (onProductAdded) onProductAdded();  // Se a função onProductAdded for passada como prop, a chama para atualizar a lista de produtos
-            setProductData({  // Reseta os campos do formulário após a adição bem-sucedida
+            await addProduct(productData);
+            if (onProductAdded) onProductAdded();
+            setProductData({
                 title: '',
                 price: '',
                 image: '',
-                category: '',
+                categoryId: '',
             });
         } catch (error) {
-            console.error('Erro ao adicionar produto:', error); // Captura e exibe erros no console se a adição falhar
+            console.error('Erro ao adicionar produto:', error);
         }
     };
 
-    // Renderiza o formulário para adicionar um produto
     return (
         <form className="add-product-form" onSubmit={handleSubmit}>
             <div className="form-group">
-                <label htmlFor="title">Nome</label>
                 <input
                     type="text"
-                    id="title"
                     name="title"
-                    placeholder="Nome do Produto"
+                    placeholder="Nome"
                     value={productData.title}
                     onChange={handleChange}
                     required
                 />
             </div>
             <div className="form-group">
-                <label htmlFor="price">Preço</label>
                 <input
                     type="number"
-                    id="price"
                     name="price"
-                    placeholder="Preço em $"
+                    placeholder="Preço"
                     value={productData.price}
                     onChange={handleChange}
                     required
                 />
             </div>
             <div className="form-group">
-                <label htmlFor="image">URL Imagem</label>
                 <input
                     type="text"
-                    id="image"
                     name="image"
                     placeholder="URL da Imagem"
                     value={productData.image}
                     onChange={handleChange}
-                    required
                 />
             </div>
             <div className="form-group">
-                <label htmlFor="category">Categoria</label>
-                <input
-                    type="text"
-                    id="category"
-                    name="category"
-                    placeholder="Categoria do Produto"
-                    value={productData.category}
+                <label htmlFor="categoryId">Categoria:</label>
+                <select
+                    name="categoryId"
+                    value={productData.categoryId}
                     onChange={handleChange}
                     required
-                />
+                >
+                    <option value="">Selecione a categoria</option>
+                    {categories.map(category => (
+                        <option key={category.id} value={category.id}>
+                            {category.name}
+                        </option>
+                    ))}
+                </select>
             </div>
             <button type="submit" className="submit-button">Adicionar Produto</button>
         </form>
     );
 };
 
-export default AddProduct; // Exporta o componente AddProduct para ser utilizado em outras partes da aplicação
+export default AddProduct;

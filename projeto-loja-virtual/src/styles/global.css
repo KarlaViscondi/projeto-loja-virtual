@@ -5,6 +5,7 @@ body {
     }
 
 header {
+    width: 100%;
     display: flex;
     align-items: center;
     background-color: #333;
@@ -12,6 +13,7 @@ header {
     padding: 10px;
     text-align: center;
 }
+
 
 .logo {
     height: 50px; /* Ajuste a altura conforme necessário */
@@ -80,6 +82,7 @@ nav a:hover {
   
 
 footer {
+    width: 100%;
     background-color: #333;
     color: #fff;
     padding: 10px;

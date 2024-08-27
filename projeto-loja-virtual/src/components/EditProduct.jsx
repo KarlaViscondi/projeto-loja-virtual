@@ -1,82 +1,94 @@
-import React, { useState, useEffect } from 'react'; // Importa React e os hooks useState e useEffect
-import { getProductById, updateProduct } from '../services/api'; // Importa as funções de serviço para buscar e atualizar produtos
-import './ProductStyle.css'; // Importa o arquivo CSS para estilização do componente.
+import React, { useState, useEffect } from 'react';
+import axios from 'axios'; // Importar axios
+import './ProductStyle.css'; 
 
-// Componente EditProduct para editar os detalhes de um produto existente
 const EditProduct = ({ productId, onProductUpdated, onCancel }) => {
-    const [product, setProduct] = useState(null); // Estado local para armazenar os dados do produto a ser editado
-    // useEffect para buscar os dados do produto quando o productId é fornecido
+    const [product, setProduct] = useState(null);
+
     useEffect(() => {
         const fetchProduct = async () => {
             try {
-                const response = await getProductById(productId); // Chama a função de API para obter os dados do produto pelo ID
-                setProduct(response.data); // Atualiza o estado com os dados do produto recebidos
+                const response = await axios.get(`https://api.escuelajs.co/api/v1/products/${productId}`);
+                setProduct(response.data);
             } catch (error) {
-                console.error('Erro ao buscar produto:', error); // Captura e exibe erros no console se a busca falhar
+                console.error('Erro ao buscar produto:', error);
             }
         };
 
-        if (productId) { // Verifica se o productId foi passado como prop
-            fetchProduct(); // Chama a função para buscar o produto
+        if (productId) {
+            fetchProduct();
         }
-    }, [productId]); // Dependência do useEffect no productId
+    }, [productId]);
 
-    // Função handleChange para atualizar o estado quando o usuário modifica os campos do formulário
     const handleChange = (e) => {
-        const { name, value } = e.target; // Desestruturação do nome e valor do input que foi modificado
-        setProduct(prevProduct => ({ ...prevProduct, [name]: value })); // Atualiza o campo específico do produto no estado
+        const { name, value } = e.target;
+        setProduct(prevProduct => ({ ...prevProduct, [name]: value }));
     };
 
-    // Função handleSubmit para lidar com o envio do formulário e atualizar o produto
     const handleSubmit = async (e) => {
-        e.preventDefault(); // Previne o comportamento padrão de recarregar a página ao enviar o formulário
+        e.preventDefault();
         try {
-            await updateProduct(productId, product); // Chama a função de API para atualizar o produto com os novos dados
-            onProductUpdated(product); // Passa o produto atualizado para a função onProductUpdated para informar que a atualização foi bem-sucedida
+            await axios.put(`https://api.escuelajs.co/api/v1/products/${productId}`, product);
+            if (onProductUpdated) onProductUpdated(); // Atualizar a lista de produtos
         } catch (error) {
-            console.error('Erro ao atualizar o produto:', error); // Captura e exibe erros no console se a atualização falhar
+            console.error('Erro ao atualizar o produto:', error);
         }
     };
 
-    // Se o produto ainda não foi carregado, exibe uma mensagem de "Carregando..."
     if (!product) return <div>Carregando...</div>;
 
-    // Renderiza o formulário para editar o produto
     return (
         <div className="edit-product-container">
             <h1>Editar Produto</h1>
             <form className="edit-product-form" onSubmit={handleSubmit}>
                 <div className="form-group">
-                    <label htmlFor="title">Título:</label>
+                    <label>Nome:</label>
                     <input
                         type="text"
-                        id="title"
                         name="title"
-                        value={product.title} // Valor do campo título preenchido com os dados do estado
-                        onChange={handleChange} // Atualiza o estado quando o usuário modifica o valor
+                        value={product.title}
+                        onChange={handleChange}
                         required
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="image">Imagem URL:</label>
+                    <label>Descrição:</label>
+                    <textarea
+                        name="description"
+                        value={product.description}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+                <div className="form-group">
+                    <label>Imagem URL:</label>
                     <input
                         type="text"
-                        id="image"
-                        name="image"
-                        value={product.image} // Valor do campo URL da imagem preenchido com os dados do estado
-                        onChange={handleChange} // Atualiza o estado quando o usuário modifica o valor
+                        name="images"
+                        value={product.images.join(', ')}
+                        onChange={(e) => handleChange({
+                            target: { name: 'images', value: e.target.value.split(',').map(url => url.trim()) }
+                        })}
                         required
                     />
                 </div>
                 <div className="form-group">
-                    <label htmlFor="price">Preço:</label>
+                    <label>Preço:</label>
                     <input
                         type="number"
-                        id="price"
                         name="price"
-                        value={product.price} // Valor do campo preço preenchido com os dados do estado
-                        onChange={handleChange} // Atualiza o estado quando o usuário modifica o valor
+                        value={product.price}
+                        onChange={handleChange}
                         required
+                    />
+                </div>
+                <div className="form-group">
+                    <label>Categoria:</label>
+                    <input
+                        type="text"
+                        name="category"
+                        value={product.category.name}
+                        readOnly
                     />
                 </div>
                 <div className="form-actions">
@@ -87,4 +99,4 @@ const EditProduct = ({ productId, onProductUpdated, onCancel }) => {
     );
 };
 
-export default EditProduct; // Exporta o componente EditProduct para ser utilizado em outras partes da aplicação
+export default EditProduct;

@@ -1,166 +1,156 @@
-// Importando as dependências do React e os componentes necessários
+// src/pages/Home.jsx
 import React, { useEffect, useState } from 'react';
-import ProductItem from '../components/ProductItem'; // Componente para exibir um item de produto
-import AddProduct from '../components/AddProduct'; // Componente para adicionar um novo produto
-import EditProduct from '../components/EditProduct'; // Componente para editar um produto existente
-import Modal from '../components/Modal'; // Componente para exibir modais (janelas modais)
-import { getProducts, addProduct, updateProduct, deleteProduct } from '../services/api'; // Funções de API para manipulação de produtos
-import './HomeStyle.css'; // Importando o arquivo de estilo CSS para estilizar a lista de produtos
+import ProductItem from '../components/ProductItem';
+import AddProduct from '../components/AddProduct';
+import EditProduct from '../components/EditProduct';
+import Modal from '../components/Modal';
+import { getProducts, addProduct, updateProduct, deleteProduct } from '../services/api';
+import { categoryTranslations } from '../translations/categoryTranslation'; // Importando o dicionário de traduções
+import './HomeStyle.css';
 
-// Componente principal Home
 const Home = () => {
-    // Definindo estados para controlar as variáveis do componente
-    const [products, setProducts] = useState([]); // Lista de produtos
-    const [editingProductId, setEditingProductId] = useState(null); // ID do produto que está sendo editado
-    const [selectedCategory, setSelectedCategory] = useState('all'); // Categoria selecionada para filtro
-    const [minPrice, setMinPrice] = useState(''); // Preço mínimo para filtro
-    const [maxPrice, setMaxPrice] = useState(''); // Preço máximo para filtro
-    const [currentPage, setCurrentPage] = useState(1); // Página atual na paginação
-    const [productsPerPage] = useState(5); // Número de produtos por página
-    const [sortOrder, setSortOrder] = useState('asc'); // Ordem de classificação (ascendente ou descendente)
-    const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false); // Estado para abrir/fechar modal de adicionar produto
-    const [isEditProductModalOpen, setIsEditProductModalOpen] = useState(false); // Estado para abrir/fechar modal de editar produto
+    const [products, setProducts] = useState([]);
+    const [editingProductId, setEditingProductId] = useState(null);
+    const [selectedCategory, setSelectedCategory] = useState('all');
+    const [minPrice, setMinPrice] = useState('');
+    const [maxPrice, setMaxPrice] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [productsPerPage] = useState(5);
+    const [sortOrder, setSortOrder] = useState('asc');
+    const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
+    const [isEditProductModalOpen, setIsEditProductModalOpen] = useState(false);
 
-    // useEffect para buscar os produtos da API quando o componente é montado ou a lista de produtos é atualizada
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await getProducts(); // Faz a chamada à API para obter os produtos
-                setProducts(response.data); // Atualiza o estado dos produtos com os dados recebidos
+                const response = await getProducts();
+                setProducts(response.data);
             } catch (error) {
-                console.error('Erro ao buscar produtos:', error); // Exibe erro caso a requisição falhe
+                console.error('Erro ao buscar produtos:', error);
             }
         };
 
-        fetchProducts(); // Chama a função para buscar os produtos
-    }, [products]); // Dependência: atualiza quando a lista de produtos muda
+        fetchProducts();
+    }, [products]);
 
-    // Filtrando os produtos com base na categoria e no intervalo de preços selecionados
+    // Filtra produtos com base na categoria selecionada e no preço
     const filteredProducts = products.filter(product => {
-        const inCategory = selectedCategory === 'all' || product.category === selectedCategory;
+        const inCategory = selectedCategory === 'all' || product.category.name === selectedCategory;
         const inPriceRange = (minPrice === '' || product.price >= minPrice) &&
-            (maxPrice === '' || product.price <= maxPrice);
-        return inCategory && inPriceRange; // Retorna os produtos que estão na categoria e no intervalo de preço
+        (maxPrice === '' || product.price <= maxPrice);
+        return inCategory && inPriceRange;
     });
 
-    // Ordenando os produtos filtrados com base no título (A-Z ou Z-A)
+    // Ordena produtos
     const sortedProducts = filteredProducts.sort((a, b) => {
         if (sortOrder === 'asc') {
-            return a.title.localeCompare(b.title); // Ordena em ordem ascendente
+            return a.title.localeCompare(b.title);
         } else {
-            return b.title.localeCompare(a.title); // Ordena em ordem descendente
+            return b.title.localeCompare(a.title);
         }
     });
 
-    // Cálculo dos índices para determinar quais produtos serão exibidos na página atual
+    // Paginação
     const indexOfLastProduct = currentPage * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-    const currentProducts = sortedProducts.slice(indexOfFirstProduct, indexOfLastProduct); // Obtém os produtos da página atual
+    const currentProducts = sortedProducts.slice(indexOfFirstProduct, indexOfLastProduct);
 
-    // Gerando o array de números de páginas para paginação
     const pageNumbers = [];
     for (let i = 1; i <= Math.ceil(sortedProducts.length / productsPerPage); i++) {
-        pageNumbers.push(i); // Adiciona o número da página ao array
+        pageNumbers.push(i);
     }
 
-    // Função para mudar a página quando o usuário clica em um número de página
     const handlePageChange = (pageNumber) => {
-        setCurrentPage(pageNumber); // Atualiza o estado da página atual
+        setCurrentPage(pageNumber);
     };
 
-    // Função para adicionar um novo produto (acionada ao enviar o formulário de adicionar produto)
     const handleProductAdded = async (productData) => {
         try {
-            await addProduct(productData); // Chama a função da API para adicionar o produto
-            const response = await getProducts(); // Busca a lista atualizada de produtos
-            setProducts(response.data); // Atualiza o estado dos produtos
-            setIsAddProductModalOpen(false); // Fecha o modal de adicionar produto
+            await addProduct(productData);
+            const response = await getProducts();
+            setProducts(response.data);
         } catch (error) {
-            console.error('Erro ao adicionar produto:', error); // Exibe erro caso a requisição falhe
+            console.error('Erro ao adicionar produto:', error);
         }
     };
 
-    // Função para atualizar um produto existente (acionada ao enviar o formulário de edição)
     const handleProductUpdated = async (productData) => {
         try {
             if (!editingProductId) {
-                throw new Error('Product ID is missing'); // Verifica se o ID do produto está presente
+                throw new Error('Product ID is missing');
             }
-            console.log('Atualizando produto com ID:', editingProductId, 'Dados:', productData);
-            await updateProduct(editingProductId, productData); // Chama a função da API para atualizar o produto
-            const response = await getProducts(); // Busca a lista atualizada de produtos
-            console.log('Resposta da API:', response);  // Verifique se a resposta é válida
+            await updateProduct(editingProductId, productData);
+            const response = await getProducts();
             if (Array.isArray(response.data)) {
-                console.log('Produtos atualizados:', response.data);  // Verifique se a lista contém produtos
-                setProducts(response.data); // Atualiza o estado dos produtos
-                setEditingProductId(null); // Reseta o ID do produto que estava sendo editado
-                setIsEditProductModalOpen(false); // Fecha o modal de edição
+                setProducts(response.data);
+                setEditingProductId(null);
             } else {
-                console.error('A resposta da API não é um array:', response.data); // Exibe erro caso a resposta não seja válida
+                console.error('A resposta da API não é um array:', response.data);
             }
         } catch (error) {
-            console.error('Erro ao atualizar produto:', error); // Exibe erro caso a requisição falhe
+            console.error('Erro ao atualizar produto:', error);
         }
     };
 
-    // Função para excluir um produto (acionada ao clicar no botão de excluir)
     const handleProductDeleted = async (productId) => {
         try {
-            await deleteProduct(productId); // Chama a função da API para excluir o produto
-            const response = await getProducts(); // Busca a lista atualizada de produtos
-            setProducts(response.data); // Atualiza o estado dos produtos
+            await deleteProduct(productId);
+            const response = await getProducts();
+            setProducts(response.data);
         } catch (error) {
-            console.error('Erro ao excluir produto:', error); // Exibe erro caso a requisição falhe
+            console.error('Erro ao excluir produto:', error);
         }
     };
 
-    // Retorna o JSX para renderizar a página Home
+    // Função para traduzir o nome da categoria
+    const translateCategory = (categoryName) => {
+        return categoryTranslations[categoryName] || categoryName; // Retorna o nome traduzido ou o original se não houver tradução
+    };
+
     return (
         <div className="home-container">
-            {/* Seção de filtros de categoria, preço e ordem */}
             <div className="filters">
                 <div className="category-filters">
                     <button onClick={() => setSelectedCategory('all')}>Todos</button>
-                    <button onClick={() => setSelectedCategory('electronics')}>Eletrônicos</button>
-                    <button onClick={() => setSelectedCategory('jewelery')}>Joias</button>
-                    <button onClick={() => setSelectedCategory("women's clothing")}>Roupas Femininas</button>
-                    <button onClick={() => setSelectedCategory("men's clothing")}>Roupas Masculinas</button>
+                    <button onClick={() => setSelectedCategory('Electronics')}>Eletrônicos</button>
+                    <button onClick={() => setSelectedCategory('Clothes')}>Roupas</button>
+                    <button onClick={() => setSelectedCategory('Furniture')}>Móveis</button>
+                    <button onClick={() => setSelectedCategory('Shoes')}>Sapatos</button>
+                    <button onClick={() => setSelectedCategory('Miscellaneous')}>Variados</button>
                 </div>
                 <div className="price-filter">
                     <input
                         type="number"
                         placeholder="Preço Mínimo"
                         value={minPrice}
-                        onChange={(e) => setMinPrice(e.target.value)} // Atualiza o estado do preço mínimo
+                        onChange={(e) => setMinPrice(e.target.value)}
                     />
                     <input
                         type="number"
                         placeholder="Preço Máximo"
                         value={maxPrice}
-                        onChange={(e) => setMaxPrice(e.target.value)} // Atualiza o estado do preço máximo
+                        onChange={(e) => setMaxPrice(e.target.value)}
                     />
                 </div>
                 <div className="sort-filter">
                     <button onClick={() => setSortOrder('asc')}>Ordenar A-Z</button>
                     <button onClick={() => setSortOrder('desc')}>Ordenar Z-A</button>
                 </div>
+                {/* Botão para abrir o modal de adicionar novo produto */}
             </div>
-
-            {/* Botão para abrir o modal de adicionar novo produto */}
             <div className="add-product-button-container">
-                <button className="add-product-button" onClick={() => setIsAddProductModalOpen(true)}>
+                    <button className="add-product-button" onClick={() => setIsAddProductModalOpen(true)}>
                     Adicionar novo produto
                 </button>
             </div>
-
-            {/* Exibição da lista de produtos */}
             <div className="product-list">
                 {currentProducts.length > 0 ? (
                     currentProducts.map(product => (
                         <div key={product.id} className="product-item">
-                            <img src={product.image} alt={product.title} />
+                            <img src={product.images[0]} alt={product.title} />
                             <div>
                                 <h2>{product.title}</h2>
+                                <p>Categoria: {translateCategory(product.category.name)}</p>
                                 <p>Preço: ${product.price}</p>
                                 <button className="edit-button" onClick={() => { setEditingProductId(product.id); setIsEditProductModalOpen(true); }}>
                                     Editar
@@ -175,8 +165,6 @@ const Home = () => {
                     <p>Não há produtos para exibir</p>
                 )}
             </div>
-
-            {/* Seção de paginação */}
             <div className="pagination">
                 {pageNumbers.map(number => (
                     <button key={number} onClick={() => handlePageChange(number)}>
@@ -184,17 +172,13 @@ const Home = () => {
                     </button>
                 ))}
             </div>
-
-            {/* Modal para adicionar novo produto */}
             {isAddProductModalOpen && (
                 <Modal onClose={() => setIsAddProductModalOpen(false)}>
                     <AddProduct onProductAdded={handleProductAdded} />
                 </Modal>
             )}
-
-            {/* Modal para editar produto existente */}
             {isEditProductModalOpen && (
-                <Modal onClose={() => { setEditingProductId(null); setIsEditProductModalOpen(false); }}>
+                <Modal onClose={() => setIsEditProductModalOpen(false)}>
                     <EditProduct 
                         productId={editingProductId} 
                         onProductUpdated={handleProductUpdated} 
@@ -206,5 +190,4 @@ const Home = () => {
     );
 };
 
-// Exporta o componente Home para ser utilizado em outras partes da aplicação
 export default Home;

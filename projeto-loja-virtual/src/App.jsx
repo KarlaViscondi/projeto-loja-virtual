@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
-import ProductList from './components/ProductList';
 import Footer from './components/Footer';
+import ProductList from './components/ProductList';
+import ManageProducts from './pages/ManageProducts'; // Verifique se o caminho está correto
 import { getProducts } from './services/api';
 
 const App = () => {
     const [products, setProducts] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState('all');
-    const [selectedPriceRange, setSelectedPriceRange] = useState(null);
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -23,15 +23,14 @@ const App = () => {
     }, []);
 
     return (
-        <div className="app">
-            <Header setSelectedCategory={setSelectedCategory} setSelectedPriceRange={setSelectedPriceRange} />
-            <ProductList
-                products={products}
-                selectedCategory={selectedCategory}
-                selectedPriceRange={selectedPriceRange}
-            />
+        <Router>
+            <Header />
+            <Routes>
+                <Route path="/" element={<ProductList products={products} />} />
+                <Route path="/manage-products" element={<ManageProducts />} />
+            </Routes>
             <Footer />
-        </div>
+        </Router>
     );
 };
 

@@ -1,0 +1,48 @@
+/* ManageProducts.css */
+.manage-products-container {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+
+.manage-products-container h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.manage-products-container ul {
+    list-style: none;
+    padding: 0;
+}
+
+.manage-products-container li {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.manage-products-container img {
+    border-radius: 4px;
+    margin-right: 20px;
+}
+
+.manage-products-container button {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.manage-products-container button:hover {
+    background-color: #0056b3;
+}
+
+.manage-products-container .add-product-container,
+.manage-products-container .edit-product-container {
+    margin-bottom: 20px;
+}

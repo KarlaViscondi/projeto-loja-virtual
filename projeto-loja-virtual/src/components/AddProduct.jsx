@@ -1,5 +1,5 @@
 import React, { useState } from 'react'; // Importa React e o hook useState para gerenciar o estado local do componente
-import './Product.css'; // Importa o arquivo CSS para estilização do componente
+import './ProductStyle.css'; // Importa o arquivo CSS para estilização do componente
 import { addProduct } from '../services/api';  // Importa a função addProduct da API para adicionar um novo produto
 
 // Componente AddProduct para adicionar novos produtos

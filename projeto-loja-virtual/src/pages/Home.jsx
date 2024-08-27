@@ -5,7 +5,7 @@ import AddProduct from '../components/AddProduct'; // Componente para adicionar 
 import EditProduct from '../components/EditProduct'; // Componente para editar um produto existente
 import Modal from '../components/Modal'; // Componente para exibir modais (janelas modais)
 import { getProducts, addProduct, updateProduct, deleteProduct } from '../services/api'; // Funções de API para manipulação de produtos
-import './ProductList.css'; // Importando o arquivo de estilo CSS para estilizar a lista de produtos
+import './HomeStyle.css'; // Importando o arquivo de estilo CSS para estilizar a lista de produtos
 
 // Componente principal Home
 const Home = () => {

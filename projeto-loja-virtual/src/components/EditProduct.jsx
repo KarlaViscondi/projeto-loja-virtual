@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'; // Importa React e os hooks useState e useEffect
 import { getProductById, updateProduct } from '../services/api'; // Importa as funções de serviço para buscar e atualizar produtos
-import './Product.css'; // Importa o arquivo CSS para estilização do componente.
+import './ProductStyle.css'; // Importa o arquivo CSS para estilização do componente.
 
 // Componente EditProduct para editar os detalhes de um produto existente
 const EditProduct = ({ productId, onProductUpdated, onCancel }) => {

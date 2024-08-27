@@ -1,5 +1,3 @@
-// src/pages/Home.jsx
-
 // Importando as dependências do React e os componentes necessários
 import React, { useEffect, useState } from 'react';
 import ProductItem from '../components/ProductItem'; // Componente para exibir um item de produto

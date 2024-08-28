@@ -25,9 +25,9 @@ const DeleteProduct = ({ productId, onProductUpdated, onClose }) => {
                 <div className="form-actions">
                     <button className="submit-button" onClick={handleSubmit} >Excluir</button> 
                 </div> 
-                {/* <div className="form-actions">
-                    <button type="submit" className="submit-button">Cancelar</button> 
-                </div> */}
+                <div className="form-actions">
+                    <button type="submit" className="submit-button" onClick={()=>onClose(false)}>Cancelar</button> 
+                </div>
         </div>
     );
 };

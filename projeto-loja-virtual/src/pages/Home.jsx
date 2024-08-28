@@ -1,13 +1,11 @@
-// src/pages/Home.jsx
 import React, { useEffect, useState } from 'react';
-import ProductItem from '../components/ProductItem';
 import AddProduct from '../components/AddProduct';
 import EditProduct from '../components/EditProduct';
 import DeleteProduct from '../components/DeleteProduct'
 import Modal from '../components/Modal';
-import { getProducts, addProduct, updateProduct, deleteProduct} from '../services/api';
-import { categoryTranslations } from '../translations/categoryTranslation'; // Importando o dicionário de traduções
-import './HomeStyle.css';
+import { getProducts, addProduct, updateProduct} from '../services/api';
+import { categoryTranslations } from '../translations/categoryTranslation';
+import '../styles/homeStyle.css';
 
 const Home = () => {
     const [products, setProducts] = useState([]);
@@ -31,11 +29,9 @@ const Home = () => {
                 console.error('Erro ao buscar produtos:', error);
             }
         };
-
         fetchProducts();
     }, [products]);
 
-    // Filtra produtos com base na categoria selecionada e no preço
     const filteredProducts = products.filter(product => {
         const inCategory = selectedCategory === 'all' || product.category.name === selectedCategory;
         const inPriceRange = (minPrice === '' || product.price >= minPrice) &&
@@ -43,7 +39,6 @@ const Home = () => {
         return inCategory && inPriceRange;
     });
 
-    // Ordena produtos
     const sortedProducts = filteredProducts.sort((a, b) => {
         if (sortOrder === 'asc') {
             return a.title.localeCompare(b.title);
@@ -52,7 +47,6 @@ const Home = () => {
         }
     });
 
-    // Paginação
     const indexOfLastProduct = currentPage * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
     const currentProducts = sortedProducts.slice(indexOfFirstProduct, indexOfLastProduct);
@@ -97,76 +91,76 @@ const Home = () => {
     const handleProductDeleted = async (productId) => {
         try {
             setEditingProductId(productId)
-            // await deleteProduct(productId);
-            // const response = await getProducts();
-            // setProducts(response.data);
         } catch (error) {
             console.error('Erro ao excluir produto:', error);
         }
     };
 
-    // Função para traduzir o nome da categoria
     const translateCategory = (categoryName) => {
-        return categoryTranslations[categoryName] || categoryName; // Retorna o nome traduzido ou o original se não houver tradução
+        return categoryTranslations[categoryName] || categoryName; 
     };
 
     return (
         <div className="home-container">
-            <div className="filters">
-                <div className="category-filters">
-                    <button onClick={() => setSelectedCategory('all')}>Todos</button>
-                    <button onClick={() => setSelectedCategory('Electronics')}>Eletrônicos</button>
-                    <button onClick={() => setSelectedCategory('Clothes')}>Roupas</button>
-                    <button onClick={() => setSelectedCategory('Furniture')}>Móveis</button>
-                    <button onClick={() => setSelectedCategory('Shoes')}>Sapatos</button>
-                    <button onClick={() => setSelectedCategory('Miscellaneous')}>Variados</button>
-                </div>
-                <div className="price-filter">
-                    <input
-                        type="number"
-                        placeholder="Preço Mínimo"
-                        value={minPrice}
-                        onChange={(e) => setMinPrice(e.target.value)}
-                    />
-                    <input
-                        type="number"
-                        placeholder="Preço Máximo"
-                        value={maxPrice}
-                        onChange={(e) => setMaxPrice(e.target.value)}
-                    />
-                </div>
-                <div className="sort-filter">
-                    <button onClick={() => setSortOrder('asc')}>Ordenar A-Z</button>
-                    <button onClick={() => setSortOrder('desc')}>Ordenar Z-A</button>
-                </div>
-                {/* Botão para abrir o modal de adicionar novo produto */}
-            </div>
             <div className="add-product-button-container">
-                    <button className="add-product-button" onClick={() => setIsAddProductModalOpen(true)}>
+                <button className="add-product-button" onClick={() => setIsAddProductModalOpen(true)}>
                     Adicionar novo produto
                 </button>
             </div>
-            <div className="product-list">
-                {currentProducts.length > 0 ? (
-                    currentProducts.map(product => (
-                        <div key={product.id} className="product-item">
-                            <img src={product.images[0]} alt={product.title} />
-                            <div>
-                                <h2>{product.title}</h2>
-                                <p>Categoria: {translateCategory(product.category.name)}</p>
-                                <p>Preço: ${product.price}</p>
-                                <button className="edit-button" onClick={() => { setEditingProductId(product.id); setIsEditProductModalOpen(true); }}>
-                                    Editar
-                                </button>
-                                <button className="delete-button" onClick={() => {handleProductDeleted(product.id); setIsDeleteModalOpen(true); }}>
-                                    Excluir
-                                </button>
+            <div className="content-wrapper">
+                <div className="filters">
+                    <div className="category-filters">
+                        <button onClick={() => setSelectedCategory('all')}>Todos</button>
+                        <button onClick={() => setSelectedCategory('Electronics')}>Eletrônicos</button>
+                        <button onClick={() => setSelectedCategory('Clothes')}>Roupas</button>
+                        <button onClick={() => setSelectedCategory('Furniture')}>Móveis</button>
+                        <button onClick={() => setSelectedCategory('Shoes')}>Sapatos</button>
+                        <button onClick={() => setSelectedCategory('Miscellaneous')}>Variados</button>
+                    </div>
+                    <div className="sort-filter">
+                        <button onClick={() => setSortOrder('asc')}>Ordenar A-Z</button>
+                        <button onClick={() => setSortOrder('desc')}>Ordenar Z-A</button>
+                    </div>
+                    <div className="price-filter">
+                        <input
+                            type="number"
+                            placeholder="Preço Mínimo"
+                            value={minPrice}
+                            onChange={(e) => setMinPrice(e.target.value)}
+                        />
+                        <input
+                            type="number"
+                            placeholder="Preço Máximo"
+                            value={maxPrice}
+                            onChange={(e) => setMaxPrice(e.target.value)}
+                        />
+                    </div>
+                </div>
+                <div className="product-list">
+                    {currentProducts.length > 0 ? (
+                        currentProducts.map(product => (
+                            <div key={product.id} className="product-item">
+                                <img src={product.images[0]} alt={product.title} />
+                                <div>
+                                    <h2>{product.title}</h2>
+                                    <p>Categoria: {translateCategory(product.category.name)}</p>
+                                    <p>Preço: ${product.price}</p>
+                                    <div className="button-container">
+                                        <button className="edit-button" onClick={() => { setEditingProductId(product.id); setIsEditProductModalOpen(true); }}>
+                                            Editar
+                                        </button>
+                                        <button className="delete-button" onClick={() => { handleProductDeleted(product.id); setIsDeleteModalOpen(true); }}>
+                                            Excluir
+                                        </button>
+                                    </div>
+                                    
+                                </div>
                             </div>
-                        </div>
-                    ))
-                ) : (
-                    <p>Não há produtos para exibir</p>
-                )}
+                        ))
+                    ) : (
+                        <p>Não há produtos para exibir</p>
+                    )}
+                </div>
             </div>
             <div className="pagination">
                 {pageNumbers.map(number => (
@@ -178,8 +172,8 @@ const Home = () => {
             {isAddProductModalOpen && (
                 <Modal onClose={() => setIsAddProductModalOpen(false)}>
                     <AddProduct 
-                    onProductAdded={handleProductAdded} 
-                    onClose={(prop) => setIsAddProductModalOpen(prop)}
+                        onProductAdded={handleProductAdded} 
+                        onClose={(prop) => setIsAddProductModalOpen(prop)}
                     />
                 </Modal>
             )}
@@ -201,7 +195,6 @@ const Home = () => {
                     />
                 </Modal>
             )}
-
         </div>
     );
 };

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'https://api.escuelajs.co/api/v1'; // https://api.escuelajs.co/api/v1/products
+const API_URL = 'https://api.escuelajs.co/api/v1'; 
 
 export const getProducts = () => axios.get(`${API_URL}/products`);
 export const getProductById = (id) => axios.get(`${API_URL}/${id}`);

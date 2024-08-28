@@ -1,4 +1,3 @@
-// src/components/ProductItem.jsx
 import React from 'react';
 
 const ProductItem = ({ product, onEdit, onDelete }) => {

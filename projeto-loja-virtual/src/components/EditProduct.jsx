@@ -1,27 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios'; // Importar axios
-import './ProductStyle.css'; 
+import axios from 'axios'; 
+import '../styles/productStyle.css';
 
-const EditProduct = ({ productId, onProductUpdated, onClose }) => {
+const EditProduct = ({ productId, onClose }) => {
     const [product, setProduct] = useState(null);
 
     useEffect(() => {
         const fetchProduct = async () => {
             try {
                 const response = await axios.get(`https://api.escuelajs.co/api/v1/products/${productId}`);
-                console.log(response.data.images)
-                console.log(response.data.images.join(', '))
                 response.data.images = response.data.images.join(', ')
                 response.data.images = response.data.images.split(', ')
                 response.data.images = response.data.images.join(', ')
                 setProduct(response.data);
-                console.log(response.data.images)
-                // console.log(typeof response.data.images.join(', '))
             } catch (error) {
                 console.error('Erro ao buscar produto:', error);
             }
         };
-
         if (productId) {
             fetchProduct();
         }
@@ -35,16 +30,11 @@ const EditProduct = ({ productId, onProductUpdated, onClose }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            
             product.images = JSON.parse(product.images)
             if (productId){
-                console.log(product)
                 await axios.put(`https://api.escuelajs.co/api/v1/products/${productId}`, product);
                 onClose(false)
             }
-            // console.log(product.images.join(', '))
-            // await axios.put(`https://api.escuelajs.co/api/v1/products/${productId}`, product);
-            // if (onProductUpdated) onProductUpdated(); // Atualizar a lista de produtos
         } catch (error) {
             console.error('Erro ao atualizar o produto:', error);
         }
@@ -107,7 +97,7 @@ const EditProduct = ({ productId, onProductUpdated, onClose }) => {
                     />
                 </div>
                 <div className="form-actions">
-                    <button type="submit" className="submit-button">Salvar</button> {/* Botão para enviar o formulário e salvar as alterações */}
+                    <button type="submit" className="submit-button">Salvar</button> 
                 </div>
             </form>
         </div>

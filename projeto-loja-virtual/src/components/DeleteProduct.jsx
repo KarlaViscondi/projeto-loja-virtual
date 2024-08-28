@@ -1,15 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios'; // Importar axios
-import './ProductStyle.css'; 
+import React, { useState } from 'react';
+import axios from 'axios'; 
+import '../styles/productStyle.css';
 
-const DeleteProduct = ({ productId, onProductUpdated, onClose }) => {
+const DeleteProduct = ({ productId, onClose }) => {
+    const [successMessage, setSuccessMessage] = useState([])
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             if (productId){
-                console.log(onClose)
                 await axios.delete(`https://api.escuelajs.co/api/v1/products/${productId}`);
-                onClose(false)
+                setSuccessMessage('Produto excluído com sucesso!');
+                setTimeout(() => {
+                    setSuccessMessage('');
+                    if (onClose) onClose(false);
+                }, 1000);
             }
         } catch (error) {
             console.error('Erro ao atualizar o produto:', error);
@@ -25,9 +30,7 @@ const DeleteProduct = ({ productId, onProductUpdated, onClose }) => {
                 <div className="form-actions">
                     <button className="submit-button" onClick={handleSubmit} >Excluir</button> 
                 </div> 
-                <div className="form-actions">
-                    <button type="submit" className="submit-button" onClick={()=>onClose(false)}>Cancelar</button> 
-                </div>
+                {successMessage && <p>{successMessage}</p>}
         </div>
     );
 };

@@ -1,15 +1,7 @@
-// src/components/AddProduct.jsx
 import React, { useEffect, useState } from 'react';
 import { addProduct, getCategory} from '../services/api';
-import './ProductStyle.css';
+import '../styles/productStyle.css';
 
-const categories = [
-    { id: 1, name: 'Eletrônicos' },
-    { id: 2, name: 'Roupas' },
-    { id: 3, name: 'Móveis' },
-    { id: 4, name: 'Sapatos' },
-    { id: 5, name: 'Variados' }
-];
 const inicializeProduct = {
     title: '',
     price: '',
@@ -18,36 +10,27 @@ const inicializeProduct = {
     description: '',
 }
 
-
-const AddProduct = ({ onProductAdded, OnClose }) => {
-    // const [productState, setProductState] = useState({
-    //     title: '',
-    //     price: '',
-    //     categoryId: '',
-    //     images: '',
-    // });
+const AddProduct = ({ onClose }) => {
     const [categoryState, setCategoryState] = useState([])
-    
+    const [successMessage, setSuccessMessage] = useState([])
     const [productState, setProductState] = useState({
         ... inicializeProduct
     })
 
-    useEffect(async () => {
+    useEffect(() => {
         const fetchCategory = async () => {
             try {
                 const response = await getCategory();
-                console.log(response.data)
                 setCategoryState([...response.data]);
             } catch (error) {
                 console.error('Erro ao buscar produtos:', error);
             }
         };
-        await fetchCategory()
-    },[])
-
+        fetchCategory();
+    }, []); 
+    
     const handleChangeData = (e) => {
         const { name, value, images } = e.target;
-        console.log(e.target.name)
         if (e.target.name === "images"){
             setProductState( (prevValues)=>({
                 ...prevValues,
@@ -59,34 +42,20 @@ const AddProduct = ({ onProductAdded, OnClose }) => {
                 [name]: value,
             }));
         }
-        console.log('nome',name, 'valor',value, 'imagem', images)
-        
     };
-    // const handleChangeData = (value, name ) => {
-    //     console.log(name, value)
-    //     setProductState((state) => ({ ...state, [name]: value }));
-    //   };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(e)
         try {
-            console.log(productState)
             if (productState){
-                await addProduct(productState)
-                OnClose(false)
-
+                await addProduct(productState);
+                setSuccessMessage('Produto adicionado com sucesso!');
+                setTimeout(() => {
+                    setSuccessMessage('');
+                    if (onClose) onClose(false);
+                }, 1000); 
             }
-        //     // await addProduct(productData);
-        //     // if (onProductAdded) onProductAdded();
-        //     // setProductData({
-        //     //     title: '',
-        //     //     price: '',
-        //     //     categoryId: '',
-        //     //     images: '',
-        //     });
         } catch (error) {
-            console.log(error.message)
             console.error('Erro ao adicionar produto:', error);
         }
     };
@@ -148,7 +117,8 @@ const AddProduct = ({ onProductAdded, OnClose }) => {
                     ))}
                 </select>
             </div>
-            <button type="submit" className="submit-button">Adicionar Produto</button>
+            <button type="submit" className="submit-button" >Adicionar Produto</button>
+            {successMessage && <p>{successMessage}</p>}
         </form>
     );
 };

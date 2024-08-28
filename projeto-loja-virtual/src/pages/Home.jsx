@@ -3,8 +3,9 @@ import React, { useEffect, useState } from 'react';
 import ProductItem from '../components/ProductItem';
 import AddProduct from '../components/AddProduct';
 import EditProduct from '../components/EditProduct';
+import DeleteProduct from '../components/DeleteProduct'
 import Modal from '../components/Modal';
-import { getProducts, addProduct, updateProduct, deleteProduct } from '../services/api';
+import { getProducts, addProduct, updateProduct, deleteProduct} from '../services/api';
 import { categoryTranslations } from '../translations/categoryTranslation'; // Importando o dicionário de traduções
 import './HomeStyle.css';
 
@@ -19,6 +20,7 @@ const Home = () => {
     const [sortOrder, setSortOrder] = useState('asc');
     const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
     const [isEditProductModalOpen, setIsEditProductModalOpen] = useState(false);
+    const [isDeleteProductModalOpen, setIsDeleteModalOpen] = useState(false);
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -94,9 +96,10 @@ const Home = () => {
 
     const handleProductDeleted = async (productId) => {
         try {
-            await deleteProduct(productId);
-            const response = await getProducts();
-            setProducts(response.data);
+            setEditingProductId(productId)
+            // await deleteProduct(productId);
+            // const response = await getProducts();
+            // setProducts(response.data);
         } catch (error) {
             console.error('Erro ao excluir produto:', error);
         }
@@ -155,7 +158,7 @@ const Home = () => {
                                 <button className="edit-button" onClick={() => { setEditingProductId(product.id); setIsEditProductModalOpen(true); }}>
                                     Editar
                                 </button>
-                                <button className="delete-button" onClick={() => handleProductDeleted(product.id)}>
+                                <button className="delete-button" onClick={() => {handleProductDeleted(product.id); setIsDeleteModalOpen(true); }}>
                                     Excluir
                                 </button>
                             </div>
@@ -174,7 +177,10 @@ const Home = () => {
             </div>
             {isAddProductModalOpen && (
                 <Modal onClose={() => setIsAddProductModalOpen(false)}>
-                    <AddProduct onProductAdded={handleProductAdded} />
+                    <AddProduct 
+                    onProductAdded={handleProductAdded} 
+                    onClose={(prop) => setIsAddProductModalOpen(prop)}
+                    />
                 </Modal>
             )}
             {isEditProductModalOpen && (
@@ -183,9 +189,19 @@ const Home = () => {
                         productId={editingProductId} 
                         onProductUpdated={handleProductUpdated} 
                         onCancel={() => { setEditingProductId(null); setIsEditProductModalOpen(false); }}
+                        onClose={(prop) => setIsEditProductModalOpen(prop)}
                     />
                 </Modal>
             )}
+            {isDeleteProductModalOpen && (
+                <Modal onClose={() => setIsDeleteModalOpen(false)}>
+                    <DeleteProduct
+                        productId={editingProductId} 
+                        onClose={(prop) => setIsDeleteModalOpen(prop)}
+                    />
+                </Modal>
+            )}
+
         </div>
     );
 };

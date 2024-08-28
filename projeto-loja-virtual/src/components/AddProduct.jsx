@@ -1,45 +1,92 @@
 // src/components/AddProduct.jsx
-import React, { useState } from 'react';
-import { addProduct } from '../services/api';
+import React, { useEffect, useState } from 'react';
+import { addProduct, getCategory} from '../services/api';
 import './ProductStyle.css';
 
-// Exemplo de categorias, geralmente você obteria isso de uma API ou prop
 const categories = [
-    { id: 'Electronics', name: 'Eletrônicos' },
-    { id: 'Clothes', name: 'Roupas' },
-    { id: 'Furniture', name: 'Móveis' },
-    { id: 'Shoes', name: 'Sapatos' },
-    { id: 'Miscellaneous', name: 'Variados' }
+    { id: 1, name: 'Eletrônicos' },
+    { id: 2, name: 'Roupas' },
+    { id: 3, name: 'Móveis' },
+    { id: 4, name: 'Sapatos' },
+    { id: 5, name: 'Variados' }
 ];
+const inicializeProduct = {
+    title: '',
+    price: '',
+    categoryId: '',
+    images: [],
+    description: '',
+}
 
-const AddProduct = ({ onProductAdded }) => {
-    const [productData, setProductData] = useState({
-        title: '',
-        price: '',
-        image: '',
-        categoryId: '',
-    });
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setProductData({
-            ...productData,
-            [name]: value,
-        });
+const AddProduct = ({ onProductAdded, OnClose }) => {
+    // const [productState, setProductState] = useState({
+    //     title: '',
+    //     price: '',
+    //     categoryId: '',
+    //     images: '',
+    // });
+    const [categoryState, setCategoryState] = useState([])
+    
+    const [productState, setProductState] = useState({
+        ... inicializeProduct
+    })
+
+    useEffect(async () => {
+        const fetchCategory = async () => {
+            try {
+                const response = await getCategory();
+                console.log(response.data)
+                setCategoryState([...response.data]);
+            } catch (error) {
+                console.error('Erro ao buscar produtos:', error);
+            }
+        };
+        await fetchCategory()
+    },[])
+
+    const handleChangeData = (e) => {
+        const { name, value, images } = e.target;
+        console.log(e.target.name)
+        if (e.target.name === "images"){
+            setProductState( (prevValues)=>({
+                ...prevValues,
+                [name]: [...prevValues.images, value],
+            }));
+        } else {
+            setProductState( (prevValues)=>({
+                ...prevValues,
+                [name]: value,
+            }));
+        }
+        console.log('nome',name, 'valor',value, 'imagem', images)
+        
     };
+    // const handleChangeData = (value, name ) => {
+    //     console.log(name, value)
+    //     setProductState((state) => ({ ...state, [name]: value }));
+    //   };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log(e)
         try {
-            await addProduct(productData);
-            if (onProductAdded) onProductAdded();
-            setProductData({
-                title: '',
-                price: '',
-                image: '',
-                categoryId: '',
-            });
+            console.log(productState)
+            if (productState){
+                await addProduct(productState)
+                OnClose(false)
+
+            }
+        //     // await addProduct(productData);
+        //     // if (onProductAdded) onProductAdded();
+        //     // setProductData({
+        //     //     title: '',
+        //     //     price: '',
+        //     //     categoryId: '',
+        //     //     images: '',
+        //     });
         } catch (error) {
+            console.log(error.message)
             console.error('Erro ao adicionar produto:', error);
         }
     };
@@ -51,8 +98,18 @@ const AddProduct = ({ onProductAdded }) => {
                     type="text"
                     name="title"
                     placeholder="Nome"
-                    value={productData.title}
-                    onChange={handleChange}
+                    value={productState.title}
+                    onChange={handleChangeData}
+                    required
+                />
+            </div>
+            <div className="form-group">
+                <input
+                    type="text"
+                    name="description"
+                    placeholder="Descrição"
+                    value={productState.description}
+                    onChange={handleChangeData}
                     required
                 />
             </div>
@@ -61,32 +118,32 @@ const AddProduct = ({ onProductAdded }) => {
                     type="number"
                     name="price"
                     placeholder="Preço"
-                    value={productData.price}
-                    onChange={handleChange}
+                    value={productState.price}
+                    onChange={handleChangeData}
                     required
                 />
             </div>
             <div className="form-group">
                 <input
                     type="text"
-                    name="image"
+                    name="images"
                     placeholder="URL da Imagem"
-                    value={productData.image}
-                    onChange={handleChange}
+                    value={productState.images}
+                    onChange={handleChangeData}
                 />
             </div>
             <div className="form-group">
                 <label htmlFor="categoryId">Categoria:</label>
                 <select
                     name="categoryId"
-                    value={productData.categoryId}
-                    onChange={handleChange}
+                    value={productState.categoryId}
+                    onChange={handleChangeData}
                     required
                 >
                     <option value="">Selecione a categoria</option>
-                    {categories.map(category => (
-                        <option key={category.id} value={category.id}>
-                            {category.name}
+                    {!categoryState || categoryState.map(category => (
+                        <option key={category?.id} value={category?.id}>
+                            {category?.name}
                         </option>
                     ))}
                 </select>
